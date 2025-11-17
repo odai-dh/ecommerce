@@ -1,45 +1,61 @@
+'use client';
+
+import { useState, useEffect } from 'react';
 import ProductGrid from '../components/product/ProductGrid';
 import Hero from '../components/layout/Hero';
 import FeaturesGrid from '../components/layout/FeaturesGrid';
-import { getAllProducts } from '@/lib/services/api';
-import { Metadata } from 'next';
+import axios from 'axios';
 
-export const metadata: Metadata = {
-  title: 'Welcome to Sellby Store - Your Favorite Online Shop',
-  description: 'Discover the best deals on electronics, fashion, and more at Sellby Store. Shop now and enjoy fast shipping and great prices!',
-  openGraph: {
-    title: 'Welcome to Sellby Store - Your Favorite Online Shop',
-    description: 'Discover the best deals on electronics, fashion, and more at Sellby Store. Shop now and enjoy fast shipping and great prices!',
-    url: 'https://sellby.netlify.app',
-    siteName: 'Sellby Store',
-    images: [
-      {
-        url: 'https://sellby.netlify.app/seo/homepage.png',
-        width: 1200,
-        height: 630,
-        alt: 'Sellby Store Homepage',
-      },
-    ],
-    locale: 'en_US',
-    type: 'website',
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: 'Welcome to Sellby Store - Your Favorite Online Shop',
-    description: 'Discover the best deals on electronics, fashion, and more at Sellby Store. Shop now and enjoy fast shipping and great prices!',
-    images: ['https://sellby.netlify.app/seo/homepage.png'],
-  },
-};
+interface Product {
+  id: string;
+  name: string;
+  price: number;
+  description: string;
+  image: string;
+  category: string;
+  stock: number;
+  rating?: number;
+}
 
-export default async function Home() {
-  const allProducts = await getAllProducts();
-  const featuredProducts = allProducts.slice(0, 4);
-  
+export default function Home() {
+  const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/products?limit=4&sortBy=createdAt&order=desc`);
+
+        if (response.data.products) {
+          // New API format with pagination
+          setFeaturedProducts(response.data.products);
+        } else {
+          // Old API format
+          setFeaturedProducts(response.data.slice(0, 4));
+        }
+      } catch (error) {
+        console.error('Error fetching featured products:', error);
+        // Set empty array on error to prevent app crash
+        setFeaturedProducts([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProducts();
+  }, []);
+
   return (
     <main className="min-h-screen bg-base-200">
       <div className="container mx-auto py-8 px-4 sm:px-6 lg:px-8">
         <Hero />
-        <ProductGrid products={featuredProducts}  />
+        {loading ? (
+          <div className="flex justify-center items-center min-h-[400px]">
+            <span className="loading loading-spinner loading-lg"></span>
+          </div>
+        ) : (
+          <ProductGrid products={featuredProducts} />
+        )}
         <FeaturesGrid />
       </div>
     </main>
