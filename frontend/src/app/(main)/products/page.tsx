@@ -72,63 +72,81 @@ export default function ProductsPage() {
       <HeroPro />
 
       {/* Search and Filter Section */}
-      <div className="mt-16 mb-8 space-y-4">
-        <h1 className="text-3xl text-white font-bold mb-6">All Products</h1>
+      <div className="mt-16 mb-8">
+        <h1 className="text-4xl font-extrabold mb-8 bg-gradient-to-r from-purple-400 to-pink-400 text-transparent bg-clip-text">
+          All Products
+        </h1>
 
         {/* Search Bar */}
-        <div className="relative">
-          <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
-          <input
-            type="text"
-            placeholder="Search products..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="input input-bordered w-full pl-10"
-          />
+        <div className="relative mb-6 group">
+          <div className="absolute inset-0 bg-gradient-to-r from-purple-600 to-pink-600 rounded-2xl blur opacity-25 group-hover:opacity-40 transition-opacity"></div>
+          <div className="relative flex items-center">
+            <MagnifyingGlassIcon className="absolute left-4 h-5 w-5 text-purple-400" />
+            <input
+              type="text"
+              placeholder="Search for products..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full pl-12 pr-4 py-4 bg-base-200 border-2 border-purple-500/30 rounded-2xl text-white placeholder-gray-400 focus:outline-none focus:border-purple-500 transition-all"
+            />
+          </div>
         </div>
 
         {/* Filters */}
-        <div className="flex flex-wrap gap-4 items-center">
+        <div className="flex flex-wrap gap-4 items-center bg-base-200/50 backdrop-blur-sm p-4 rounded-2xl border border-white/10">
           {/* Category Filter */}
-          <select
-            value={category}
-            onChange={(e) => {
-              setCategory(e.target.value);
-              setCurrentPage(1);
-            }}
-            className="select select-bordered"
-          >
-            {categories.map((cat) => (
-              <option key={cat} value={cat}>
-                {cat.charAt(0).toUpperCase() + cat.slice(1)}
-              </option>
-            ))}
-          </select>
+          <div className="flex-1 min-w-[200px]">
+            <label className="text-xs text-gray-400 mb-1 block">Category</label>
+            <select
+              value={category}
+              onChange={(e) => {
+                setCategory(e.target.value);
+                setCurrentPage(1);
+              }}
+              className="w-full px-4 py-2 bg-base-300 border border-purple-500/30 rounded-xl text-white focus:outline-none focus:border-purple-500 transition-all"
+            >
+              {categories.map((cat) => (
+                <option key={cat} value={cat}>
+                  {cat.charAt(0).toUpperCase() + cat.slice(1)}
+                </option>
+              ))}
+            </select>
+          </div>
 
           {/* Sort By */}
-          <select
-            value={sortBy}
-            onChange={(e) => setSortBy(e.target.value)}
-            className="select select-bordered"
-          >
-            <option value="createdAt">Newest</option>
-            <option value="name">Name</option>
-            <option value="price">Price</option>
-          </select>
+          <div className="flex-1 min-w-[200px]">
+            <label className="text-xs text-gray-400 mb-1 block">Sort By</label>
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value)}
+              className="w-full px-4 py-2 bg-base-300 border border-purple-500/30 rounded-xl text-white focus:outline-none focus:border-purple-500 transition-all"
+            >
+              <option value="createdAt">Newest First</option>
+              <option value="name">Name</option>
+              <option value="price">Price</option>
+            </select>
+          </div>
 
           {/* Order */}
-          <select
-            value={order}
-            onChange={(e) => setOrder(e.target.value)}
-            className="select select-bordered"
-          >
-            <option value="desc">Descending</option>
-            <option value="asc">Ascending</option>
-          </select>
+          <div className="flex-1 min-w-[200px]">
+            <label className="text-xs text-gray-400 mb-1 block">Order</label>
+            <select
+              value={order}
+              onChange={(e) => setOrder(e.target.value)}
+              className="w-full px-4 py-2 bg-base-300 border border-purple-500/30 rounded-xl text-white focus:outline-none focus:border-purple-500 transition-all"
+            >
+              <option value="desc">High to Low</option>
+              <option value="asc">Low to High</option>
+            </select>
+          </div>
 
           {/* Results Count */}
-          <div className="text-sm text-gray-400">
-            Showing {products.length} of {pagination.total} products
+          <div className="w-full md:w-auto text-center md:text-left">
+            <div className="px-4 py-2 bg-gradient-to-r from-purple-600/20 to-pink-600/20 rounded-xl border border-purple-500/30">
+              <span className="text-sm font-semibold text-white">
+                {products.length} of {pagination.total} products
+              </span>
+            </div>
           </div>
         </div>
       </div>
