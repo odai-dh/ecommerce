@@ -3,24 +3,66 @@
 import { useState } from 'react';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
+import { toast } from 'react-toastify';
 
 export default function RegisterPage() {
   const [formData, setFormData] = useState({ name: '', email: '', password: '' });
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+    setError(''); // Clear error on input change
+  };
+
+  const validatePassword = (password: string): string | null => {
+    if (password.length < 8) {
+      return 'Password must be at least 8 characters long';
+    }
+    if (!/[A-Z]/.test(password)) {
+      return 'Password must contain at least one uppercase letter';
+    }
+    if (!/[a-z]/.test(password)) {
+      return 'Password must contain at least one lowercase letter';
+    }
+    if (!/[0-9]/.test(password)) {
+      return 'Password must contain at least one number';
+    }
+    return null;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError('');
+
+    // Validate form fields
+    if (!formData.name.trim()) {
+      setError('Name is required');
+      return;
+    }
+    if (!formData.email.trim()) {
+      setError('Email is required');
+      return;
+    }
+
+    const passwordError = validatePassword(formData.password);
+    if (passwordError) {
+      setError(passwordError);
+      return;
+    }
+
+    setLoading(true);
     try {
-      const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/users/profile`, formData);
-      console.log('User registered:', response.data);
-      router.push('/auth/login'); // Redirect to login page
+      const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/users/register`, formData);
+      toast.success('Registration successful! Please login.');
+      router.push('/auth/login');
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Something went wrong');
+      const errorMessage = err.response?.data?.message || 'Registration failed. Please try again.';
+      setError(errorMessage);
+      toast.error(errorMessage);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -70,9 +112,26 @@ export default function RegisterPage() {
                 className="input input-bordered w-full"
               />
             </div>
-            <button type="submit" className="btn btn-primary w-full">
-              Register
+            <button
+              type="submit"
+              className="btn btn-primary w-full"
+              disabled={loading}
+            >
+              {loading ? (
+                <>
+                  <span className="loading loading-spinner"></span>
+                  Registering...
+                </>
+              ) : (
+                'Register'
+              )}
             </button>
+            <p className="text-sm text-center mt-4">
+              Already have an account?{' '}
+              <a href="/auth/login" className="link link-primary">
+                Login here
+              </a>
+            </p>
           </form>
         </div>
       </div>

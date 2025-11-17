@@ -11,6 +11,13 @@ const productSchema = new mongoose.Schema({
   rating: { type: Number, default: 0 },
 }, { timestamps: true });
 
+// Add indexes for better query performance
+productSchema.index({ name: 'text', description: 'text' }); // Full-text search
+productSchema.index({ category: 1 }); // Category filtering
+productSchema.index({ price: 1 }); // Price sorting
+productSchema.index({ createdAt: -1 }); // Latest products
+productSchema.index({ rating: -1 }); // Top rated products
+
 const Product = mongoose.model('Product', productSchema);
 
 export default Product;
