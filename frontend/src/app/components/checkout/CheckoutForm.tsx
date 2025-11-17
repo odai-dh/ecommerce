@@ -7,6 +7,8 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useState } from 'react';
 import Link from 'next/link';
+import axios from 'axios';
+import { toast } from 'react-toastify';
 
 const formSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
@@ -20,7 +22,7 @@ const formSchema = z.object({
 export default function CheckoutForm({ total }: { total: number }) {
   const stripe = useStripe();
   const elements = useElements();
-  const { clearCart } = useCart();
+  const { cartItems, clearCart } = useCart();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   
@@ -79,7 +81,39 @@ export default function CheckoutForm({ total }: { total: number }) {
       if (confirmError) {
         throw new Error(confirmError.message);
       }
-  
+
+      // Create order in the database
+      const token = localStorage.getItem('token');
+      if (token) {
+        try {
+          await axios.post(
+            `${process.env.NEXT_PUBLIC_API_URL}/orders`,
+            {
+              items: cartItems.map(item => ({
+                productId: item.id,
+                name: item.name,
+                image: item.image,
+                price: item.price,
+                quantity: item.quantity,
+              })),
+              shippingAddress: data,
+              paymentIntentId: paymentIntent.id,
+              totalPrice: total,
+            },
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
+          toast.success('Order placed successfully!');
+        } catch (orderError) {
+          console.error('Error creating order:', orderError);
+          // Don't fail the checkout if order creation fails
+          toast.warning('Payment succeeded but failed to save order. Please contact support.');
+        }
+      }
+
       // Clear cart on success
       clearCart();
       window.location.href = '/checkout/success';

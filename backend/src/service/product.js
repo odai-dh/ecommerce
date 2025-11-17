@@ -38,9 +38,58 @@ export const createProduct = async (req, res) => {
 };
 export const getProducts = async (req, res) => {
   try {
-    const products = await Product.find();
-    res.status(200).json(products);
+    const {
+      search = '',
+      category = '',
+      sortBy = 'createdAt',
+      order = 'desc',
+      page = 1,
+      limit = 12
+    } = req.query;
+
+    // Build search query
+    const query = {};
+
+    // Search by name or description
+    if (search) {
+      query.$or = [
+        { name: { $regex: search, $options: 'i' } },
+        { description: { $regex: search, $options: 'i' } }
+      ];
+    }
+
+    // Filter by category
+    if (category && category !== 'all') {
+      query.category = category;
+    }
+
+    // Calculate pagination
+    const skip = (parseInt(page) - 1) * parseInt(limit);
+
+    // Build sort object
+    const sortOrder = order === 'asc' ? 1 : -1;
+    const sortObj = { [sortBy]: sortOrder };
+
+    // Get total count for pagination
+    const total = await Product.countDocuments(query);
+
+    // Get products with filters, sorting, and pagination
+    const products = await Product.find(query)
+      .sort(sortObj)
+      .skip(skip)
+      .limit(parseInt(limit));
+
+    res.status(200).json({
+      products,
+      pagination: {
+        total,
+        page: parseInt(page),
+        limit: parseInt(limit),
+        pages: Math.ceil(total / parseInt(limit))
+      }
+    });
   } catch (error) {
+    console.error('Error fetching products:', error);
     res.status(500).json({ message: 'Server Error' });
   }
 };

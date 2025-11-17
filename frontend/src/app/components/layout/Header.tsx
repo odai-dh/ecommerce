@@ -63,6 +63,9 @@ export default function Header() {
                         <Link href="/auth/profile">Profile</Link>
                       </li>
                       <li>
+                        <Link href="/auth/orders">My Orders</Link>
+                      </li>
+                      <li>
                         <button onClick={handleLogout} className="text-red-500">
                           Logout
                         </button>

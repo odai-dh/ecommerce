@@ -2,16 +2,38 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { createUser, findUserByEmail, updateUser } from '../service/user.js';
 
+// Password validation function
+const validatePassword = (password) => {
+  const errors = [];
+  if (password.length < 8) {
+    errors.push('Password must be at least 8 characters long');
+  }
+  if (!/[A-Z]/.test(password)) {
+    errors.push('Password must contain at least one uppercase letter');
+  }
+  if (!/[a-z]/.test(password)) {
+    errors.push('Password must contain at least one lowercase letter');
+  }
+  if (!/[0-9]/.test(password)) {
+    errors.push('Password must contain at least one number');
+  }
+  return errors;
+};
+
 // Register a new user
 export const registerUserController = async (req, res) => {
   try {
     const { name, email, password } = req.body;
-    console.log('Request Body:', req.body);
 
     // Validate input
     if (!name || !email || !password) {
-        console.log('Validation failed: Missing fields');
       return res.status(400).json({ message: 'Name, email, and password are required' });
+    }
+
+    // Validate password strength
+    const passwordErrors = validatePassword(password);
+    if (passwordErrors.length > 0) {
+      return res.status(400).json({ message: passwordErrors.join('. ') });
     }
 
     // Check if the user already exists
