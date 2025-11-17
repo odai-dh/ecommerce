@@ -7,32 +7,26 @@ module.exports = {
   theme: {
     extend: {
       animation: {
-        'blob': 'blob 7s infinite',
-        'fade-in-up': 'fadeInUp 0.5s ease-out',
-        'fade-in': 'fadeIn 0.5s ease-out',
+        'gradient': 'gradient 8s linear infinite',
+        'fade-in-up': 'fadeInUp 0.6s ease-out',
+        'fade-in': 'fadeIn 0.6s ease-out',
         'slide-in': 'slideIn 0.5s ease-out',
-        'bounce-slow': 'bounce 3s infinite',
-        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+        'float': 'float 6s ease-in-out infinite',
+        'shimmer': 'shimmer 2s linear infinite',
       },
       keyframes: {
-        blob: {
-          '0%': {
-            transform: 'translate(0px, 0px) scale(1)',
+        gradient: {
+          '0%, 100%': {
+            'background-position': '0% 50%'
           },
-          '33%': {
-            transform: 'translate(30px, -50px) scale(1.1)',
-          },
-          '66%': {
-            transform: 'translate(-20px, 20px) scale(0.9)',
-          },
-          '100%': {
-            transform: 'translate(0px, 0px) scale(1)',
+          '50%': {
+            'background-position': '100% 50%'
           },
         },
         fadeInUp: {
           '0%': {
             opacity: '0',
-            transform: 'translateY(20px)',
+            transform: 'translateY(30px)',
           },
           '100%': {
             opacity: '1',
@@ -55,6 +49,39 @@ module.exports = {
             transform: 'translateX(0)',
           },
         },
+        float: {
+          '0%, 100%': {
+            transform: 'translateY(0px)',
+          },
+          '50%': {
+            transform: 'translateY(-20px)',
+          },
+        },
+        shimmer: {
+          '0%': {
+            transform: 'translateX(-100%)',
+          },
+          '100%': {
+            transform: 'translateX(100%)',
+          },
+        },
+      },
+      backgroundSize: {
+        '300%': '300%',
+      },
+      colors: {
+        ocean: {
+          50: '#f0f9ff',
+          100: '#e0f2fe',
+          200: '#bae6fd',
+          300: '#7dd3fc',
+          400: '#38bdf8',
+          500: '#0ea5e9',
+          600: '#0284c7',
+          700: '#0369a1',
+          800: '#075985',
+          900: '#0c4a6e',
+        },
       },
     },
   },
@@ -64,10 +91,10 @@ module.exports = {
       {
         dark: {
           ...require('daisyui/src/theming/themes')['dark'],
-          primary: '#a855f7',
-          secondary: '#ec4899',
+          primary: '#0ea5e9',
+          secondary: '#06b6d4',
           accent: '#f59e0b',
-          neutral: '#1f2937',
+          neutral: '#1e293b',
           'base-100': '#0f172a',
           'base-200': '#1e293b',
           'base-300': '#334155',
