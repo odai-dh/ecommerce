@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import ProductGrid from '../../components/product/ProductGrid';
 import HeroPro from '@/app/components/layout/HeroPro';
 import axios from 'axios';
@@ -29,12 +29,7 @@ export default function ProductsPage() {
     return () => clearTimeout(timer);
   }, [searchTerm]);
 
-  // Fetch products when filters change
-  useEffect(() => {
-    fetchProducts();
-  }, [debouncedSearchTerm, category, sortBy, order, currentPage]);
-
-  const fetchProducts = async () => {
+  const fetchProducts = useCallback(async () => {
     setLoading(true);
     try {
       const params = new URLSearchParams({
@@ -61,7 +56,12 @@ export default function ProductsPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [debouncedSearchTerm, category, sortBy, order, currentPage]);
+
+  // Fetch products when filters change
+  useEffect(() => {
+    fetchProducts();
+  }, [fetchProducts]);
 
   const categories = useMemo(() => {
     return ['all', 'electronics', 'clothing', 'books', 'home', 'sports'];

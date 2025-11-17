@@ -1,10 +1,11 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 
 interface OrderItem {
   productId: number;
@@ -36,11 +37,7 @@ export default function OrdersPage() {
   const [loading, setLoading] = useState(true);
   const router = useRouter();
 
-  useEffect(() => {
-    fetchOrders();
-  }, []);
-
-  const fetchOrders = async () => {
+  const fetchOrders = useCallback(async () => {
     const token = localStorage.getItem('token');
     if (!token) {
       toast.error('Please login to view orders');
@@ -64,7 +61,11 @@ export default function OrdersPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [router]);
+
+  useEffect(() => {
+    fetchOrders();
+  }, [fetchOrders]);
 
   const getStatusColor = (status: string) => {
     const colors: Record<string, string> = {
@@ -104,7 +105,7 @@ export default function OrdersPage() {
 
       {orders.length === 0 ? (
         <div className="text-center py-16">
-          <p className="text-xl text-gray-400 mb-4">You haven't placed any orders yet</p>
+          <p className="text-xl text-gray-400 mb-4">You haven&apos;t placed any orders yet</p>
           <Link href="/products" className="btn btn-primary">
             Start Shopping
           </Link>
@@ -145,9 +146,11 @@ export default function OrdersPage() {
                       key={index}
                       className="flex items-center gap-4 p-2 bg-base-300 rounded"
                     >
-                      <img
+                      <Image
                         src={item.image}
                         alt={item.name}
+                        width={64}
+                        height={64}
                         className="w-16 h-16 object-cover rounded"
                       />
                       <div className="flex-1">
